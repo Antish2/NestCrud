@@ -1,0 +1,13 @@
+model token {
+  token_id   String    @default(uuid()) @db.Uuid
+  name       String
+  hashedKey  String    @unique
+  partialKey String
+  expires    DateTime?
+  lastUsed   DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  user_id     String @db.Uuid
+
+  @@index([user_id])
+}
