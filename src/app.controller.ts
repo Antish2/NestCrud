@@ -1,7 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { AppService } from './app.service';
 import { ConfigService } from '@nestjs/config';
-import { PrismaService } from './common/config/prisma.service';
+import { PrismaService } from './prisma/prisma.service';
 
 @Controller()
 export class AppController {
@@ -13,8 +13,8 @@ export class AppController {
   // }
 
   @Get()
-  getTest(): number{
+  getTest(): string{
     //const configService = app.get(ConfigService)
-    return this.config.get<number>('port');
+    return this.config.get<string>('DATABASE_URL');
   }
 }

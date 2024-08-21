@@ -2,14 +2,15 @@ model users {
 user_id  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
 name     String   @unique @db.VarChar(256)
 email    String    @unique @db.VarChar(256)
-password String    @unique @db.VarChar(256)
-role    Role     @default(USER)
-createdAt   DateTime @default(now())
-updatedAt   DateTime @updatedAt
+password String    @db.VarChar(256)
+role    Role     @default(User)
+created_at   DateTime @default(now()) @db.Timestamp(3)
+updated_at   DateTime? @db.Timestamp(3)
 
 }
 
 enum Role {
-  USER
-  ADMIN
+    Admin 
+    Moderator 
+    User  
 }
