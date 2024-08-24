@@ -1,33 +1,26 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export enum Role {
-  Admin ='Admin',
-  Moderator ='Moderator',
-  User ='User'
+  Admin = 'Admin',
+  Moderator = 'Moderator',
+  User = 'User',
 }
 export class user {
-
-  
-  @ApiProperty({description: 'Enter User Name'})
+  @ApiProperty({ description: 'Enter User Name' })
   name: string;
 
-  
-  @ApiProperty({description: 'Enter Email Address'})
+  @ApiProperty({ description: 'Enter Email Address' })
   email: string;
 
- 
-  @ApiProperty({description: 'Enter Password'})
+  @ApiProperty({ description: 'Enter Password' })
   password: string;
 
-
-  @ApiProperty({ enum: ['Admin', 'Moderator', 'User']})
+  @ApiProperty({ enum: ['Admin', 'Moderator', 'User'] })
   role: Role;
-  
 
   @ApiProperty()
-   created_at:Date;
+  created_at: Date;
 
- 
-   @ApiProperty()
-   updated_at:Date;
+  @ApiProperty()
+  updated_at: Date;
 }

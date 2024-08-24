@@ -1,38 +1,51 @@
-import { Get, Injectable } from '@nestjs/common';
+import { Get, Injectable, UnauthorizedException } from '@nestjs/common';
 import { get } from 'https';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateAuthDto } from './dto/CreateAuthDto';
-
+import { UserService } from 'src/user/user.service';
+import { JwtService } from '@nestjs/jwt';
+import { user } from 'src/user/dto/user';
+import * as bcrypt from 'bcrypt';
+import { use } from 'passport';
 @Injectable()
 export class AuthService {
-constructor(private readonly prisma:PrismaService){}
+  constructor(
+    private readonly prisma: PrismaService,
+    private user: UserService,
+    private jwtservice: JwtService,
+  ) {}
 
-    create(createauthdto: CreateAuthDto) {
+  async validateUser(username:string,password:string) :Promise<user>
+    { console.log('validate1');
+      const user = await this.user.findOneUser(username);
+      console.log('validate');
+      console.log(user);
+      if (user && bcrypt.compareSync(password, user.password)) 
+        {
+           const result = user;
+           return result;
+        }
+        return null;
+  }
 
-        //console.log(createauthdto);
-        
-        const result = this.prisma.$executeRawUnsafe(
-          `INSERT INTO users(name, email, password, role) VALUES 
-          ('${createauthdto.name}','${createauthdto.email}','${createauthdto.password}','${createauthdto.role}')`)
-        return  result;
-    }
+  async login(
+    username: string,
+    pass: string,
+  ): Promise<{ access_token: string }> {
+    console.log(username);
+    console.log(pass);
 
-    findAll() {
-        return this.prisma.$queryRawUnsafe(`select * from users`);
-    }
+    // const xres= this.validateUser(username,pass);
+    // console.log(xres);
+    const xuser = await this.user.findOneUser(username);
+    // console.log(user);
+    // if (user?.password !== pass) {
+    //   throw new UnauthorizedException();
+    // }
+    const payload = { sub: xuser.name, username: xuser.name };
 
-    findOne(id: string) {
-    
-    console.log(id);
-    return this.prisma.$queryRawUnsafe(`select * from users where user_id='${id}'` );
-    }
-
-
-    delete(id: string) {
-  
-    console.log(id);
-    return this.prisma.$queryRawUnsafe(`delete from users where user_id=` + id);
-   }
-
-
+    return {
+      access_token: await this.jwtservice.signAsync(payload),
+    };
+  }
 }

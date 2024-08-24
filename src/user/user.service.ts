@@ -7,82 +7,46 @@ import { user } from './dto/user';
 import { UpdateUserDto } from './dto/UpdateUserDto';
 import { join } from 'path';
 import { AnyFilesInterceptor } from '@nestjs/platform-express';
+import { commonquery } from './commonquery';
 
 @Injectable()
 export class UserService {
-constructor(private prisma:PrismaService){}
+  constructor(
+    private prisma: PrismaService,
+    private qry: commonquery,
+  ) {}
 
-// create(createuserdto: CreateUserDto) {
+  async create(createuserdto: CreateUserDto): Promise<user> {
+    let query = this.qry.insert(createuserdto);
 
-//     //console.log(createauthdto);
-    
-//     const result = this.prisma.$executeRawUnsafe(
-//       `INSERT INTO users(name, email, password, role) VALUES 
-//       ('${createuserdto.name}','${createuserdto.email}','${createuserdto.password}','${createuserdto.role}')`)
-//     return  result;
-// }
-async create(createuserdto:CreateUserDto): Promise<user> {
+    const result = await this.prisma.$queryRawUnsafe<user>(query);
 
-    const query =`INSERT INTO users(name, email, password, role) VALUES 
-        ('${createuserdto.name}','${createuserdto.email}','${createuserdto.password}','${createuserdto.role}') RETURNING *;`
-    
-        const result = await this.prisma.$queryRawUnsafe<user>(query);
-        
-        return result;
+    return result;
   }
 
-  async update(id:string,updateuserdto:UpdateUserDto) 
-  {
-   // console.log(id);
-    // console.log(Object.keys(updateuserdto).forEach(function(key) 
-    // {
-    //     console.log('Key : ' + key + ', Value : ' + updateuserdto[key])
-    // })
-    // );
-
-    // for (var key in updateuserdto) {
-    //     if (updateuserdto.hasOwnProperty(key)) {
-    //       var val = updateuserdto[key];
-    //       console.log(val);
-    //     }
-    //   }
-      // Object.keys(updateuserdto).forEach(function(key){
-    //     if(updateuserdto[key] != null ||  updateuserdto[key] !='undefined')
-    //         str += join(`${key} ='${updateuserdto[key] }',`)
-    // });
-    let qryParam:string=``;
-    let strParam :string =``;
-    //console.log(updateuserdto);
-    for (let key in updateuserdto) 
-    {
-        if(updateuserdto[key] != null ||  updateuserdto[key] !='undefined')
-           strParam += join(`${key} ='${updateuserdto[key] }',`)   
-    }
-   // console.log(strParam.substring(0, strParam.length - 1));
-
-    qryParam =`update users set ${strParam.substring(0, strParam.length - 1)} where user_id='${id}' RETURNING *`;
-
-    //console.log(qryParam);
-
+  async update(id: string, updateuserdto: UpdateUserDto) {
+    let qryParam: string = this.qry.update(updateuserdto, id);
     const result = await this.prisma.$queryRawUnsafe(qryParam);
     console.log(result);
     return result;
   }
-async findAll() {
+  async findAll() {
     console.log(await this.prisma.$queryRawUnsafe(`select * from users`));
     return await this.prisma.$queryRawUnsafe(`select * from users`);
-}
+  }
 
-async findOne(id: string) : Promise<user>{
+  async findOne(id: string): Promise<user> {
+    let qry: string = this.qry.select(id);
+    return await this.prisma.$queryRawUnsafe(qry);
+  }
 
-//console.log(id);
-return await this.prisma.$queryRawUnsafe(`select * from users where user_id='${id}'` );
-}
+  async findOneUser(name: string): Promise<user> {
+    let qry: string = this.qry.selectName(name);
+    return await this.prisma.$queryRawUnsafe(qry);
+  }
 
-
-delete(id: string) {
-
-console.log(id);
-return this.prisma.$queryRawUnsafe(`delete from users where user_id=` + id);
-}
+  async delete(id: string) {
+    console.log(id);
+    return this.prisma.$queryRawUnsafe(`delete from users where user_id=` + id);
+  }
 }

@@ -5,7 +5,11 @@ import { PrismaService } from './prisma/prisma.service';
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService, private readonly config:ConfigService, private prisma :PrismaService) {}
+  constructor(
+    private readonly appService: AppService,
+    private readonly config: ConfigService,
+    private prisma: PrismaService,
+  ) {}
 
   // @Get()
   // getHello(): string {
@@ -13,7 +17,7 @@ export class AppController {
   // }
 
   @Get()
-  getTest(): string{
+  getTest(): string {
     //const configService = app.get(ConfigService)
     return this.config.get<string>('DATABASE_URL');
   }
