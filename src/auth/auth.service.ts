@@ -20,6 +20,8 @@ export class AuthService {
       const user = await this.user.findOneUser(username);
       console.log('validate');
       console.log(user);
+
+
       if (user && bcrypt.compareSync(password, user.password)) 
         {
            const result = user;
